@@ -1,11 +1,11 @@
 class Cube
-  # Orientations/faces  Facing camera is F
-  # U R F L D B R
 
-  @cube_state = ''
-  @orientation = 'F'
+  attr_accessor :state
 
-  def initialise(cube_state)
-    @cube_state = cube_state
+  @state = ''
+
+  def initialize(cube_state)
+    @state = cube_state
   end
+
 end
