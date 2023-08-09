@@ -1,6 +1,6 @@
 # rubiks by poho
 
-##Ruby 3.2.2
+## Ruby 3.2.2
 ```
 sudo apt-get update
 sudo apt install -y libyaml-dev gcc git libssl-dev make zlib1g-dev imagemagick
@@ -16,14 +16,14 @@ Clone python version
 https://github.com/muodov/kociemba
 in `kociemba/ckociemba` run `make` and you'll have a binary to call in the bin dir
 
-##Camera
+## Camera
 ```
 libcamera-hello --tuning-file /usr/share/libcamera/ipa/raspberrypi/ov5647.json
 libcamera-jpeg -o test.jpg
  ```
 
 
-##ImageMagick
+## ImageMagick
 ```
 libcamera-jpeg -o test.jpg
 rm -f 1.jpg 2.jpg 3.jpg 4.jpg 5.jpg 6.jpg 7.jpg 8.jpg 9.jpg colours.txt
