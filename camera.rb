@@ -17,6 +17,15 @@ class Camera
     yellow: [[155, 255], [170, 255], [0,   10 ]],
   }
 
+  COLOURS = {
+    blue:   [0,0,255],
+    orange: [255,128,0],
+    white:  [255,255,255],
+    green:  [0,255,0],
+    red:    [255,0,0],
+    yellow: [255,255,0],
+  }
+
   def run
     capture
     crop
@@ -24,7 +33,7 @@ class Camera
   end
 
   def capture
-    `libcamera-jpeg -o cache/capture.jpg`
+    # `libcamera-jpeg -o cache/capture.jpg`
   end
 
   def crop
@@ -45,6 +54,7 @@ class Camera
         command = "convert cache/#{(3*x)+(y)}.jpg -resize 1x1 txt:- | tail -n1 | awk '{print $2}'"
         # puts command
         str = `#{command}`
+        # puts str
         values = str[1..-1].chop.split(",").map &:to_f
         classified = classify(values)
         puts "#{(3*x)+(y)}.jpg, #{values}, #{classified}"
@@ -55,7 +65,27 @@ class Camera
     ret
   end
 
+  def distance(p1, p2)
+    x = p2[0] - p1[0]
+    y = p2[1] - p1[1]
+    z = p2[2] - p1[2]
+    Math.sqrt((x*x) + (y*y) + (z*z))
+  end
+
   def classify(colour)
+    found = 9999999
+    ret   = :unknown
+    COLOURS.each do |k,v|
+      dist = distance(colour, v)
+      if dist < found
+        ret = k
+        found = dist
+      end
+    end
+    ret
+  end
+
+  def classify_old(colour)
     r,g,b = colour
     ret = :unknown
     COLOUR_VALUES.each do |k,v|
