@@ -7,5 +7,8 @@ require_relative 'utilities.rb'
 # cube = Cube.new(scramble)
 # puts Utilities.get_solve_string(cube.state)
 
-camera = Camera.new
-puts colours
+colours = Camera.new.run
+
+#Utilities.print_colours([:red, :blue, :green, :yellow, :white, :orange, :white, :white, :white])
+Utilities.print_colours(colours)
+

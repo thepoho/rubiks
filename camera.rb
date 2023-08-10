@@ -1,6 +1,6 @@
 class Camera
 
-  X_OFFSET_START = 450
+  X_OFFSET_START = 500
   X_OFFSET_ADD   = 600
 
   Y_OFFSET_START = 50
@@ -18,22 +18,23 @@ class Camera
   }
 
   COLOURS = {
-    blue:   [0,0,255],
-    orange: [255,128,0],
-    white:  [255,255,255],
-    green:  [0,255,0],
-    red:    [255,0,0],
-    yellow: [255,255,0],
+    blue:   [0,88,207],
+    orange: [235,77,0],
+    white:  [172,170,163],
+    green:  [40,175,21],
+    red:    [212,9,14],
+    yellow: [167,180,0],
   }
 
   def run
-    capture
+    puts "not capturing camera"
+    #capture
     crop
     colours
   end
 
   def capture
-    # `libcamera-jpeg -o cache/capture.jpg`
+    `libcamera-jpeg -n -t1 -o cache/capture.jpg`
   end
 
   def crop
@@ -47,6 +48,7 @@ class Camera
   end
 
   def colours
+    averages = [0,0,0]
     ret = []
     (0..2).each do |x|
       (0..2).each do |y|
@@ -56,12 +58,17 @@ class Camera
         str = `#{command}`
         # puts str
         values = str[1..-1].chop.split(",").map &:to_f
+        (0..2).each do |a|
+          averages[a] += values[a]
+        end
         classified = classify(values)
         puts "#{(3*x)+(y)}.jpg, #{values}, #{classified}"
         ret << classified
       end
     end
 
+    averages = averages.map{|x| x/9.0}
+    puts averages.inspect
     ret
   end
 
@@ -85,20 +92,19 @@ class Camera
     ret
   end
 
-  def classify_old(colour)
-    r,g,b = colour
-    ret = :unknown
-    COLOUR_VALUES.each do |k,v|
-      next unless r > v[0][0] && r < v[0][1]
-      next unless g > v[1][0] && g < v[1][1]
-      next unless b > v[2][0] && b < v[2][1]
-      return k
-    end
-    ret
-  end
+#  def classify_old(colour)
+#    r,g,b = colour
+#    ret = :unknown
+#    COLOUR_VALUES.each do |k,v|
+#      next unless r > v[0][0] && r < v[0][1]
+#      next unless g > v[1][0] && g < v[1][1]
+#      next unless b > v[2][0] && b < v[2][1]
+#      return k
+#    end
+#    ret
+#  end
 
   def cleanup
     # `rm -f 1.jpg 2.jpg 3.jpg 4.jpg 5.jpg 6.jpg 7.jpg 8.jpg 9.jpg colours.txt`
   end
 end
-Camera.new.run
