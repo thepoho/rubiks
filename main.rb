@@ -7,8 +7,12 @@ require_relative 'utilities.rb'
 # cube = Cube.new(scramble)
 # puts Utilities.get_solve_string(cube.state)
 
-colours = Camera.new.run
+#colours = Camera.new.run
 
 #Utilities.print_colours([:red, :blue, :green, :yellow, :white, :orange, :white, :white, :white])
-Utilities.print_colours(colours)
+#Utilities.print_colours(colours)
 
+robot = Robot.new
+ARGV.each do |x|
+  robot.perform(x)
+end

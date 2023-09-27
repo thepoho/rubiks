@@ -27,8 +27,8 @@ class Camera
   }
 
   def run
-    puts "not capturing camera"
-    #capture
+    #puts "not capturing camera"
+    capture
     crop
     colours
   end

@@ -1,9 +1,15 @@
 # rubiks by poho
 
-## Ruby 3.2.2
+## Prerequisites
 ```
 sudo apt-get update
-sudo apt install -y libyaml-dev gcc git libssl-dev make zlib1g-dev imagemagick
+sudo apt install -y libyaml-dev gcc git libssl-dev make zlib1g-dev imagemagick i2c-tools python3-pip
+sudo pip3 install adafruit-circuitpython-servokit
+
+```
+
+## Ruby 3.2.2
+```
 git clone https://github.com/rbenv/rbenv.git ~/.rbenv
 echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.bashrc #ubuntu
 echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.bash_profile #others
