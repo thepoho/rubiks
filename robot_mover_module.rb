@@ -7,7 +7,7 @@ module RobotMoverModule
   SERVO_RIGHT_ROTATOR = 3
 
   LEFT_GRIPPER_UNGRIPPED  = 180
-  LEFT_GRIPPER_GRIPPED    = 118
+  LEFT_GRIPPER_GRIPPED    = 116
   RIGHT_GRIPPER_UNGRIPPED = 180
   RIGHT_GRIPPER_GRIPPED   = 121
   LEFT_GRIPPER_STRAIGHT   = 180
@@ -15,9 +15,13 @@ module RobotMoverModule
   RIGHT_GRIPPER_STRAIGHT  = 180
   RIGHT_GRIPPER_ROTATED   = 40
 
-  SLEEP_TIME = 0.3
+  SLEEP_TIME = 0.2
+
   def initialize
-    loose_grip_all
+    @left_gripped  = false
+    @right_gripped = false
+    #puts "poho"
+    #loose_grip_all
   end
 
   def rotate_direction_left
@@ -34,8 +38,6 @@ module RobotMoverModule
     untwist_right
     sleep(SLEEP_TIME)
     grip_right
-    sleep(SLEEP_TIME)
-    loose_grip_all
   end
 
   def rotate_direction_right
@@ -52,8 +54,6 @@ module RobotMoverModule
     untwist_left
     sleep(SLEEP_TIME)
     grip_left
-    sleep(SLEEP_TIME)
-    loose_grip_all
   end
 
   def twist_face_left
@@ -66,8 +66,6 @@ module RobotMoverModule
     untwist_left
     sleep(SLEEP_TIME)
     grip_left
-    sleep(SLEEP_TIME)
-    loose_grip_all
   end
   
   def twist_face_right
@@ -80,30 +78,36 @@ module RobotMoverModule
     untwist_right
     sleep(SLEEP_TIME)
     grip_right
-    sleep(SLEEP_TIME)
-    loose_grip_all
   end
 
   def ungrip_left
+    return unless @left_gripped
     cmd(SERVO_LEFT_GRIPPER, LEFT_GRIPPER_UNGRIPPED)
+    @left_gripped = false
   end
 
   def grip_left
-    loose_grip_left
+   # loose_grip_left
+    return if @left_gripped
     cmd(SERVO_LEFT_GRIPPER, LEFT_GRIPPER_GRIPPED)
-    loose_grip_left
-    cmd(SERVO_LEFT_GRIPPER, LEFT_GRIPPER_GRIPPED)
+    @left_gripped = true
+  #  loose_grip_left
+  #  cmd(SERVO_LEFT_GRIPPER, LEFT_GRIPPER_GRIPPED)
   end
 
   def ungrip_right
+    return unless @right_gripped
     cmd(SERVO_RIGHT_GRIPPER, RIGHT_GRIPPER_UNGRIPPED)
+    @right_gripped = false
   end
 
   def grip_right
-    loose_grip_right
+    return if @right_gripped
+    #loose_grip_right
     cmd(SERVO_RIGHT_GRIPPER, RIGHT_GRIPPER_GRIPPED)
-    loose_grip_right
-    cmd(SERVO_RIGHT_GRIPPER, RIGHT_GRIPPER_GRIPPED)
+    @right_gripped = true
+  #  loose_grip_right
+  #  cmd(SERVO_RIGHT_GRIPPER, RIGHT_GRIPPER_GRIPPED)
   end
 
   def twist_left
@@ -141,10 +145,12 @@ module RobotMoverModule
 
   def loose_grip_left
     cmd(SERVO_LEFT_GRIPPER,  LEFT_GRIPPER_GRIPPED+10)
+    @left_gripped = false
   end
 
   def loose_grip_right
     cmd(SERVO_RIGHT_GRIPPER, RIGHT_GRIPPER_GRIPPED+10)
+    @right_gripped = false
   end
 
   def slow_grip

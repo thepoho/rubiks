@@ -29,13 +29,22 @@ class Robot
       IDX[:b],
       IDX[:d],
     ]
+    super()
   end
+
 
   MAIN_GRIPPER = 3
   REAR_GRIPPER = 5
   GRIPPER_FACES = [MAIN_GRIPPER, REAR_GRIPPER]
 
-  def perform(face)
+  def perform(moves)
+    moves.split.each do |x|
+      puts "#{x}"
+      perform_move(x)
+    end
+    loose_grip_all
+  end
+  def perform_move(face)
     reverse = face.include? "'"
     face = face[0].to_sym
     gripper = get_to_gripper(face)
