@@ -8,22 +8,22 @@ class Camera
 
   CROP = 100
 
-  COLOUR_VALUES = {
-    blue:   [[0,   10 ], [0,   150], [128, 255]],
-    orange: [[225, 255], [85,  155], [0,   64 ]],
-    white:  [[128, 255], [170, 255], [170, 255]],
-    green:  [[25,  75 ], [128, 255], [0,  75  ]],
-    red:    [[100, 255], [0,   50 ], [0,   100]],
-    yellow: [[155, 255], [170, 255], [0,   10 ]],
-  }
+  #COLOUR_VALUES = {
+  #  blue:   [[0,   10 ], [0,   150], [128, 255]],
+  #  orange: [[225, 255], [85,  155], [0,   64 ]],
+  #  white:  [[128, 255], [170, 255], [170, 255]],
+  #  green:  [[25,  75 ], [128, 255], [0,  75  ]],
+  #  red:    [[100, 255], [0,   50 ], [0,   100]],
+  #  yellow: [[155, 255], [170, 255], [0,   10 ]],
+  #}
 
   COLOURS = {
-    blue:   [0,88,207],
-    orange: [235,77,0],
-    white:  [172,170,163],
-    green:  [40,175,21],
-    red:    [212,9,14],
-    yellow: [167,180,0],
+    white:  [133,126,122],
+    red:    [112,4,6],
+    yellow: [162,156,3],
+    orange: [190, 42,4],
+    blue:   [1,23,67],
+    green:  [21,90,11],
   }
 
   def run
@@ -34,7 +34,8 @@ class Camera
   end
 
   def capture
-    `libcamera-jpeg -n -t1 -o cache/capture.jpg`
+    #`libcamera-jpeg -n -t1 -o cache/capture.jpg`
+    `libcamera-still  -t 1 --shutter 500 --gain 0.5 -o cache/capture.jpg`
   end
 
   def crop

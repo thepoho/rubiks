@@ -1,7 +1,9 @@
 class Utilities
 
   def self.get_solve_string(scramble)
-    `bin/kociemba #{scramble}`
+    ret = `bin/kociemba #{scramble}`
+    ret = ret.rstrip
+    ret.gsub("1\n2\n3\n","").downcase
   end
 
   def self.print_colours(colours)
