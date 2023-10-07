@@ -24,6 +24,18 @@ class Utilities
   def self.yellow;      "\e[43m \e[0m" end
   def self.blue;        "\e[44m \e[0m" end
   def self.white;       "\e[47m \e[0m" end
+
+  def self.c_to_r(arr)
+    translations = {
+      white:  'u',
+      orange: 'f',
+      yellow: 'd',
+      blue:   'l',
+      green:  'r',
+      red:    'b'
+    }
+    arr.map{|x| translations[x]}
+  end
 end
 
 

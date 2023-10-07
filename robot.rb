@@ -36,6 +36,7 @@ class Robot
   MAIN_GRIPPER = 3
   REAR_GRIPPER = 5
   GRIPPER_FACES = [MAIN_GRIPPER, REAR_GRIPPER]
+  CAMERA_FACE = 0
 
   def perform(moves)
     moves.split.each do |x|
@@ -44,6 +45,7 @@ class Robot
     end
     loose_grip_all
   end
+
   def perform_move(face)
     reverse = face.include? "'"
     face = face[0].to_sym
@@ -61,6 +63,10 @@ class Robot
         twist_face_left
       end
     end
+  end
+
+  def get_to_camera(face)
+    return if is_in_camera?(face)
   end
 
   def get_to_gripper(face)
@@ -86,6 +92,30 @@ class Robot
   end
   def is_in_gripper?(face)
     !!which_gripper?(face)
+  end
+
+  def get_to_camera(face)
+    return if(is_in_camera?(face))
+    if @orientation[IDX[face]] == IDX[:b]
+      translate_left
+    elsif @orientation[IDX[face]] == IDX[:d]
+      translate_left
+      translate_left
+    elsif @orientation[IDX[face]] == IDX[:f]
+      translate_left
+      translate_left
+      translate_left
+    elsif @orientation[IDX[face]] == IDX[:r]
+      translate_right
+      translate_left
+      translate_left
+    elsif @orientation[IDX[face]] == IDX[:l]
+      translate_right
+      translate_left
+    end
+  end
+  def is_in_camera?(face)
+    @orientation[IDX[face]] == CAMERA_FACE
   end
 
   def translate_left
