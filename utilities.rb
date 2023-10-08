@@ -38,7 +38,14 @@ class Utilities
     }
     arr.map{|x| translations[x]}
   end
+
+  def self.rotate_array(arr)
+    # rotates 3x3  array 90 degrees clockwise
+   [
+     [arr[2][0],arr[1][0],arr[0][0]],
+     [arr[2][1],arr[1][1],arr[0][1]],
+     [arr[2][2],arr[1][2],arr[0][2]],
+   ] 
+  end
 end
-
-
 
