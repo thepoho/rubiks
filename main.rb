@@ -1,3 +1,4 @@
+require 'yaml'
 require_relative 'camera.rb'
 require_relative 'cube.rb'
 require_relative 'robot.rb'
@@ -9,11 +10,16 @@ require_relative 'utilities.rb'
 
 #colours = Camera.new.run
 
+if File.exist?('colours.yml')
+  Camera.set_colours YAML.load_file('colours.yml')
+else
+  puts "No colours.yml. Please run calibrate.rb"
+  exit
+end
 #puts Utilities.c_to_r(colours)
 viewed = {}
 strs = []
 r = Robot.new
-r.print
 File.delete('debug.log') rescue nil
 [:u,:b,:d,:f,:l,:r].each do |x|
   r.get_to_camera(x)

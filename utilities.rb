@@ -1,5 +1,13 @@
 class Utilities
 
+    TRANSLATIONS = {
+      white:  'u',
+      orange: 'f',
+      yellow: 'd',
+      blue:   'l',
+      green:  'r',
+      red:    'b'
+    }
   def self.get_solve_string(scramble)
     ret = `bin/kociemba #{scramble}`
     ret = ret.rstrip
@@ -28,15 +36,11 @@ class Utilities
   def self.white;       "\e[47m \e[0m" end
 
   def self.c_to_r(arr)
-    translations = {
-      white:  'u',
-      orange: 'f',
-      yellow: 'd',
-      blue:   'l',
-      green:  'r',
-      red:    'b'
-    }
-    arr.map{|x| translations[x]}
+    arr.map{|x| TRANSLATIONS[x]}
+  end
+
+  def self.face_to_colour(face)
+    TRANSLATIONS.invert[face.to_s]
   end
 
   def self.rotate_array(arr)

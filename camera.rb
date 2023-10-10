@@ -17,20 +17,38 @@ class Camera
   #  yellow: [[155, 255], [170, 255], [0,   10 ]],
   #}
 
-  COLOURS = {
-    white:  [145, 136, 134],
-    red:    [118,10,10],
-    yellow: [173, 166, 14],
-    orange: [197, 52, 15],
-    blue:   [6, 33, 82],
-    green:  [31, 99, 16],
+  COLOURS_OLD = {
+  white:  [109, 104, 102],
+  red:    [88, 2, 0],
+  yellow: [135, 129, 0],
+  orange: [164, 34, 1],
+  blue:   [0, 14, 57],
+  green:  [13, 72, 4],
   }
+
+  #COLOURS = YAML.load_file('colours.yml')
+
+  @@colours = {}
+
+  def self.set_colours(data)
+    @@colours = data
+  end
+
+  def show_colours
+    @@colours
+  end
 
   def run
     #puts "not capturing camera"
     capture
     crop
     colours
+  end
+
+  def get_averages
+    capture
+    crop
+    colours(return_averages: true)
   end
 
   def capture
@@ -48,7 +66,7 @@ class Camera
     end
   end
 
-  def colours
+  def colours(return_averages: false)
     averages = [0,0,0]
     ret = []
     (0..2).each do |x|
@@ -73,6 +91,7 @@ class Camera
     averages = averages.map{|x| (x/9.0).to_i}
     puts averages.inspect
     File.open('debug.log','a') {|f| f.puts averages.inspect}
+    return averages if return_averages
     ret
   end
 
@@ -86,7 +105,7 @@ class Camera
   def classify(colour)
     found = 9999999
     ret   = :unknown
-    COLOURS.each do |k,v|
+    @@colours.each do |k,v|
       dist = distance(colour, v)
       if dist < found
         ret = k

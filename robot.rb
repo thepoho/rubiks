@@ -90,6 +90,7 @@ class Robot
       twist_face_right
       if double
         twist_face_right
+        return
       end
       unless reverse
         twist_face_right
@@ -99,6 +100,7 @@ class Robot
       twist_face_left
       if double
         twist_face_left
+        return
       end
       unless reverse
         twist_face_left
