@@ -13,12 +13,14 @@ require_relative 'utilities.rb'
 viewed = {}
 strs = []
 r = Robot.new
+r.print
+File.delete('debug.log') rescue nil
 [:u,:b,:d,:f,:l,:r].each do |x|
-#[:f,:l,:r].each do |x|
   r.get_to_camera(x)
   colours = Camera.new.run
   viewed[x] = Utilities.c_to_r(colours)
 end
+
 
 puts viewed.inspect
 
@@ -55,7 +57,6 @@ tmp = viewed[:b].each_slice(3).to_a
 tmp = Utilities.rotate_array(tmp)
 strs << tmp.flatten
 
-
 #[:u, :l, :f, :r, :b, :d].each do |x|
 #  strs << viewed[x]
 #end
@@ -64,9 +65,9 @@ puts strs
 
 solve_string = Utilities.get_solve_string(strs)
 puts solve_string
-puts "BOOOOO" if solve_string == "unsolvable cube!"
-r.loose_grip_all
-Robot.new.perform(solve_string)
+unless solve_string == "unsolvable cube!"
+  r.perform(solve_string)
+end
 r.loose_grip_all
 #Utilities.print_colours([:red, :blue, :green, :yellow, :white, :orange, :white, :white, :white])
 

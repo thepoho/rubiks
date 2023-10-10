@@ -18,12 +18,12 @@ class Camera
   #}
 
   COLOURS = {
-    white:  [133,126,122],
-    red:    [112,4,6],
-    yellow: [162,156,3],
-    orange: [190, 42,4],
-    blue:   [1,23,67],
-    green:  [21,90,11],
+    white:  [145, 136, 134],
+    red:    [118,10,10],
+    yellow: [173, 166, 14],
+    orange: [197, 52, 15],
+    blue:   [6, 33, 82],
+    green:  [31, 99, 16],
   }
 
   def run
@@ -63,13 +63,16 @@ class Camera
           averages[a] += values[a]
         end
         classified = classify(values)
-        puts "#{(3*x)+(y)}.jpg, #{values}, #{classified}"
+        txt =  "#{(3*x)+(y)}.jpg, #{values}, #{classified}"
+        puts txt
+        File.open('debug.log','a') {|f| f.puts txt}
         ret << classified
       end
     end
 
-    averages = averages.map{|x| x/9.0}
+    averages = averages.map{|x| (x/9.0).to_i}
     puts averages.inspect
+    File.open('debug.log','a') {|f| f.puts averages.inspect}
     ret
   end
 
