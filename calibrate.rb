@@ -21,5 +21,5 @@ File.delete('debug.log') rescue nil
   puts viewed.inspect
 end
 puts viewed.inspect
-robot.loose_grip_all
+r.loose_grip_all
 File.open("colours.yml","w"){|f| f.puts viewed.to_yaml}

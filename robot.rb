@@ -117,7 +117,7 @@ class Robot
       translate_left
     elsif fo == :f
       translate_left
-    elsif fo == :r 
+    elsif fo == :b 
       translate_right
     elsif fo == :l
       translate_right
