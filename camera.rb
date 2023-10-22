@@ -124,7 +124,7 @@ class Camera
         if calibrating
           all[num] = values
         else
-          classified = classify(values)
+          classified = classify(num, values)
         end
         txt =  "#{(3*x)+(y)}.jpg, #{values}, #{classified || nil}"
         puts txt
@@ -144,11 +144,12 @@ class Camera
     Math.sqrt((x*x) + (y*y) + (z*z))
   end
 
-  def classify(colour)
+  def classify(pos, rgb)
     found = 9999999
     ret   = :unknown
     @@colours.each do |k,v|
-      dist = distance(colour, v)
+      next if k == :shutter
+      dist = distance(rgb, v[pos])
       if dist < found
         ret = k
         found = dist

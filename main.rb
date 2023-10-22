@@ -69,6 +69,10 @@ strs << tmp.flatten
 strs = strs.flatten.join.upcase
 puts strs
 
+
+r.loose_grip_all
+sleep(1)
+
 solve_string = Utilities.get_solve_string(strs)
 puts solve_string
 unless solve_string == "unsolvable cube!"
