@@ -28,10 +28,15 @@ class Camera
 
   #COLOURS = YAML.load_file('colours.yml')
 
+  BRIGHTNESS_LOWER = 40
+  BRIGHTNESS_UPPER = 55
+
   @@colours = {}
+  @@shutter = 10_000
 
   def self.set_colours(data)
     @@colours = data
+    @@shutter = data[:shutter]
   end
 
   def show_colours
@@ -48,12 +53,53 @@ class Camera
   def get_averages
     capture
     crop
-    colours(return_averages: true)
+    colours(calibrating: true)
+  end
+  
+  def calibrate_shutter
+
+    brightness = -1
+    shutter = 15_000
+    loops = 0
+    loop do
+      filename = "capture.jpg"
+      capture(shutter: @@shutter, filename: filename)
+      brightness = get_image_brightness(filename)
+      puts "Shutter: #{@@shutter}, brightness: #{brightness}"
+      break if brightness >= BRIGHTNESS_LOWER && brightness <= BRIGHTNESS_UPPER
+      if brightness < BRIGHTNESS_LOWER
+        @@shutter += 5_000
+      else
+        @@shutter -= 2_000
+      end
+      loops += 1
+      if loops > 15
+        puts "Failed to get brightness"
+        exit
+      end
+    end
+    puts "Shutter is #{@@shutter}"
+    @@shutter
   end
 
-  def capture
+  def capture(shutter: 25000, gain: 0.5, filename: 'capture.jpg')
     #`libcamera-jpeg -n -t1 -o cache/capture.jpg`
-    `libcamera-still  -t 1 --shutter 500 --gain 0.5 -o cache/capture.jpg`
+    #`python3 ~/src/rubiks/lib/led.py 1`
+    `libcamera-still  -t 2 --shutter #{shutter} --gain #{gain} -o cache/#{filename}`
+    #`python3 ~/src/rubiks/lib/led.py 0`
+  end
+
+  def get_image_brightness(image)
+    command = "convert cache/#{image} -colorspace hsb -resize 1x1 txt:- | tail -n1 | awk '{print $2}'"
+    str = `#{command}`
+    #(60.1895,56.0891%,3.89258%)
+    str[1..-1].chop.split(",").last.gsub("%","").to_f
+  end
+
+  def get_image_average(image)
+    command = "convert cache/#{image} -resize 1x1 txt:- | tail -n1 | awk '{print $2}'"
+    str = `#{command}`
+    values = str[1..-1].chop.split(",").map &:to_f
   end
 
   def crop
@@ -66,32 +112,28 @@ class Camera
     end
   end
 
-  def colours(return_averages: false)
-    averages = [0,0,0]
+  def colours(calibrating: false)
+    all = []
     ret = []
     (0..2).each do |x|
       (0..2).each do |y|
-        # hex_command = "convert #{x+y}.jpg -resize 1x1 txt:- | tail -n1 | awk '{print $3}'"
-        command = "convert cache/#{(3*x)+(y)}.jpg -resize 1x1 txt:- | tail -n1 | awk '{print $2}'"
-        # puts command
+        num = (3*x)+(y)
+        command = "convert cache/#{num}.jpg -resize 1x1 txt:- | tail -n1 | awk '{print $2}'"
         str = `#{command}`
-        # puts str
         values = str[1..-1].chop.split(",").map &:to_f
-        (0..2).each do |a|
-          averages[a] += values[a]
+        if calibrating
+          all[num] = values
+        else
+          classified = classify(values)
         end
-        classified = classify(values)
-        txt =  "#{(3*x)+(y)}.jpg, #{values}, #{classified}"
+        txt =  "#{(3*x)+(y)}.jpg, #{values}, #{classified || nil}"
         puts txt
         File.open('debug.log','a') {|f| f.puts txt}
         ret << classified
       end
     end
-
-    averages = averages.map{|x| (x/9.0).to_i}
-    puts averages.inspect
-    File.open('debug.log','a') {|f| f.puts averages.inspect}
-    return averages if return_averages
+    pp all
+    return all if calibrating
     ret
   end
 
