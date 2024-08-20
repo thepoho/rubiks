@@ -1,5 +1,10 @@
 # rubiks by poho
 
+## To run
+1. Put the cube in with white facing camera, orange facing you
+1. `ruby calibrate.rb`
+1. `ruby main.rb`
+
 ## Prerequisites
 ```
 sudo apt-get update
