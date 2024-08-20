@@ -8,6 +8,40 @@ sudo pip3 install adafruit-circuitpython-servokit
 
 ```
 
+## Debug Mode
+
+Start an `irb` console and use
+```
+load("robot.rb") && r = Robot.new
+```
+
+Then can use
+```
+r.uga #un-grip all
+r.lga #loose-grip all
+r.ga  #grip-all
+
+# full commanhd listing in robot_mover_module
+  alias_method :rdl, :rotate_direction_left
+  alias_method :rdr, :rotate_direction_right
+  alias_method :tfl, :twist_face_left
+  alias_method :tfr, :twist_face_right
+  alias_method :uga, :ungrip_all
+  alias_method :ga,  :grip_all
+  alias_method :lga, :loose_grip_all
+  alias_method :lgl, :loose_grip_left
+  alias_method :lgr, :loose_grip_right
+  alias_method :ugl, :ungrip_left
+  alias_method :gl,  :grip_left
+  alias_method :ugr, :ungrip_right
+  alias_method :gr,  :grip_right
+  alias_method :tr,  :twist_right
+  alias_method :utr, :untwist_right
+  alias_method :tl,  :twist_left
+  alias_method :utl, :untwist_left
+
+
+```
 ## Ruby 3.2.2
 ```
 git clone https://github.com/rbenv/rbenv.git ~/.rbenv
