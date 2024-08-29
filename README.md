@@ -9,7 +9,7 @@
 ```
 sudo apt-get update
 sudo apt install -y libyaml-dev gcc git libssl-dev make zlib1g-dev imagemagick i2c-tools python3-pip
-sudo pip3 install adafruit-circuitpython-servokit
+sudo pip3 install adafruit-circuitpython-servokit pillow adafruit-circuitpython-ssd1306
 
 ```
 
