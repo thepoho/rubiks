@@ -25,6 +25,10 @@ class Menu
     @changed = true
   end
 
+  def shutdown_selected?
+    @selected == 2
+  end
+
   def render
     return unless @changed
     tmp = []
@@ -100,7 +104,10 @@ class Main
           elsif @input.was_pressed?(PIN_DOWN)
             @menu.move_down
           elsif @input.was_pressed?(PIN_SELECT)
-           #TODO 
+            if @menu.shutdown_selected?
+              `python3 screen_text.py "Shutting-" "Down" "Bye!"`
+              `sudo shutdown -h now`
+            end
           end
           @next_input = Time.now + 1
         end
