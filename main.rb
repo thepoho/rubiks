@@ -31,6 +31,7 @@ class Menu
 
   def render
     return unless @changed
+    puts "called render"
     tmp = []
     TEXTS.each_with_index do |x, idx|
       if idx == @selected
@@ -43,6 +44,7 @@ class Menu
     str = "\"#{tmp.join("\" \"")}\""
     `python3 screen_text.py #{str}`
     @changed = false
+    puts "finished render"
   end
 end
 
@@ -59,19 +61,26 @@ class Input
     `raspi-gpio set #{PIN_UP},#{PIN_DOWN},#{PIN_SELECT} pu`
   end
   def read
-    #puts @old_states.inspect
+    return if Time.now < @next_input
     output = `raspi-gpio get #{PIN_DOWN},#{PIN_UP},#{PIN_SELECT}`.split("\n")
     values = output.map{|x| x.match(/GPIO\s(\d{2}):\slevel=(\d)/)}
     #puts output.inspect
     changed = false
+    #puts "--- old states"
+    #puts @old_states.inspect
     values.each do |x|
       tmp = x[2] == "0"
-      changed = true if tmp != @old_states[x[1]]
+      #puts "tmp: #{tmp}, x: #{x}, x1: #{x[1]}, osx1: #{@old_states[x[1].to_i]}"
+      if tmp != @old_states[x[1].to_i]
+        changed = true 
+        puts "found a changed"
+      end
       if tmp
         @old_states[x[1].to_i] = tmp
       end
     end
     if changed
+      puts "changed"
       @next_input = Time.now + 0.5 #one second cooldown
     end
     #puts @old_states.inspect
@@ -90,31 +99,29 @@ class Main
     @state = :menu
     @input = Input.new
     @menu = Menu.new
-    @next_input = Time.now - 59
   end
 
   def run
 
     while 1 do
       if @state == :menu
-        @menu.render
-        if Time.now > @next_input
-          if @input.was_pressed?(PIN_UP)
-            @menu.move_up
-          elsif @input.was_pressed?(PIN_DOWN)
-            @menu.move_down
-          elsif @input.was_pressed?(PIN_SELECT)
-            if @menu.shutdown_selected?
-              `python3 screen_text.py "Shutting-" "Down" "Bye!"`
-              `sudo shutdown -h now`
-            end
-          end
+        @input.read
+        if @input.was_pressed?(PIN_UP)
+          @menu.move_up
           @next_input = Time.now + 1
+        elsif @input.was_pressed?(PIN_DOWN)
+          @menu.move_down
+          @next_input = Time.now + 1
+        elsif @input.was_pressed?(PIN_SELECT)
+          if @menu.shutdown_selected?
+            `python3 screen_text.py "Shutting-" "Down" "Bye!"`
+            `sudo shutdown -h now`
+          end
         end
+        @menu.render
       elsif @state == :calibrating
       elsif @state == :solving
       end
-      @input.read
       sleep 0.1
     end
   end
