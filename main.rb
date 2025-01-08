@@ -3,6 +3,9 @@
 PIN_UP     = 27
 PIN_DOWN   = 17
 PIN_SELECT = 22
+require_relative "calibrate.rb"
+require_relative "solve.rb"
+require_relative "robot.rb"
 
 
 
@@ -10,6 +13,11 @@ class Menu
   TEXTS = ["SOLVE", "CALIBRATE", "SHUT-DOWN"]
   def initialize
     @selected = 0
+    @changed = true
+  end
+
+  def set_selected(num)
+    @selected = num
     @changed = true
   end
 
@@ -29,9 +37,18 @@ class Menu
     @selected == 2
   end
 
-  def render
-    return unless @changed
-    puts "called render"
+  def calibrate_selected?
+    @selected == 1
+  end
+
+  def solve_selected?
+    @selected == 0
+  end
+
+  def render(force: false)
+    unless force
+      return unless @changed
+    end
     tmp = []
     TEXTS.each_with_index do |x, idx|
       if idx == @selected
@@ -44,7 +61,6 @@ class Menu
     str = "\"#{tmp.join("\" \"")}\""
     `python3 screen_text.py #{str}`
     @changed = false
-    puts "finished render"
   end
 end
 
@@ -60,31 +76,26 @@ class Input
     puts "setting pull-ups"
     `raspi-gpio set #{PIN_UP},#{PIN_DOWN},#{PIN_SELECT} pu`
   end
+
   def read
     return if Time.now < @next_input
     output = `raspi-gpio get #{PIN_DOWN},#{PIN_UP},#{PIN_SELECT}`.split("\n")
     values = output.map{|x| x.match(/GPIO\s(\d{2}):\slevel=(\d)/)}
-    #puts output.inspect
     changed = false
-    #puts "--- old states"
-    #puts @old_states.inspect
     values.each do |x|
       tmp = x[2] == "0"
-      #puts "tmp: #{tmp}, x: #{x}, x1: #{x[1]}, osx1: #{@old_states[x[1].to_i]}"
       if tmp != @old_states[x[1].to_i]
         changed = true 
-        puts "found a changed"
       end
       if tmp
         @old_states[x[1].to_i] = tmp
       end
     end
     if changed
-      puts "changed"
       @next_input = Time.now + 0.5 #one second cooldown
     end
-    #puts @old_states.inspect
   end
+
   def was_pressed?(pin)
     ret = @old_states[pin]
     @old_states[pin] = false
@@ -114,8 +125,18 @@ class Main
           @next_input = Time.now + 1
         elsif @input.was_pressed?(PIN_SELECT)
           if @menu.shutdown_selected?
-            `python3 screen_text.py "Shutting-" "Down" "Bye!"`
+            `python3 screen_text.py "Shutting-" "Down" "Bye!" &`
+            #exit
             `sudo shutdown -h now`
+          elsif @menu.solve_selected?
+            `python3 screen_text.py "Solving" "Please Wait" &`
+            Solve.run
+            @menu.render(force: true)
+          elsif @menu.calibrate_selected?
+            `python3 screen_text.py "Calibrating" "Please Wait" &`
+            Calibrate.run
+            @menu.set_selected(0)
+            @menu.render(force: true)
           end
         end
         @menu.render

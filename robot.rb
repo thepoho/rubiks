@@ -74,7 +74,9 @@ class Robot
   end
 
   def perform(moves)
-    moves.split.each do |x|
+    total = moves.split.count
+    moves.split.each_with_index do |x, idx|
+      `python3 screen_text.py "Solving" "#{idx/total}" &`
       puts "#{x}"
       perform_move(x)
     end

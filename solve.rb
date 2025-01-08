@@ -10,8 +10,13 @@ require_relative 'utilities.rb'
 
 #colours = Camera.new.run
 
+class Solve
+  def self.run
+    camera = Camera.new
+    #sleep 5
+    #return
 if File.exist?('colours.yml')
-  Camera.set_colours YAML.load_file('colours.yml')
+  camera.set_colours YAML.load_file('colours.yml')
 else
   puts "No colours.yml. Please run calibrate.rb"
   exit
@@ -21,9 +26,10 @@ viewed = {}
 strs = []
 r = Robot.new
 File.delete('debug.log') rescue nil
-[:u,:b,:d,:f,:l,:r].each do |x|
+[:u,:b,:d,:f,:l,:r].each_with_index do |x, idx|
+  `python3 screen_text.py "Analysing" "#{idx+1}/6" &`
   r.get_to_camera(x)
-  colours = Camera.new.run
+  colours = camera.run
   viewed[x] = Utilities.c_to_r(colours)
 end
 
@@ -75,7 +81,12 @@ sleep(1)
 
 solve_string = Utilities.get_solve_string(strs)
 puts solve_string
-unless solve_string == "unsolvable cube!"
+if solve_string == "unsolvable cube!"
+  `python3 screen_text.py "Unsolvable!"`
+  r.loose_grip_all
+  sleep 5
+  return
+else
   r.perform(solve_string)
 end
 r.loose_grip_all
@@ -87,3 +98,6 @@ r.loose_grip_all
 #ARGV.each do |x|
 #  robot.perform(x)
 #end
+
+  end
+end

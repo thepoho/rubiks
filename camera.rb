@@ -31,27 +31,27 @@ class Camera
   BRIGHTNESS_LOWER = 40
   BRIGHTNESS_UPPER = 55
 
-  @@colours = {}
-  @@shutter = 10_000
+  @colours = {}
+  @shutter = 10_000
 
-  def self.set_colours(data)
-    @@colours = data
-    @@shutter = data[:shutter]
+  def set_colours(data)
+    @colours = data
+    @shutter = data[:shutter]
   end
 
   def show_colours
-    @@colours
+    @colours
   end
 
   def run
     #puts "not capturing camera"
-    capture
+    capture(shutter: @shutter)
     crop
     colours
   end
 
   def get_averages
-    capture
+    capture(shutter: @shutter)
     crop
     colours(calibrating: true)
   end
@@ -59,18 +59,18 @@ class Camera
   def calibrate_shutter
 
     brightness = -1
-    shutter = 15_000
+    @shutter = 15_000
     loops = 0
     loop do
       filename = "capture.jpg"
-      capture(shutter: @@shutter, filename: filename)
+      capture(shutter: @shutter, filename: filename)
       brightness = get_image_brightness(filename)
-      puts "Shutter: #{@@shutter}, brightness: #{brightness}"
+      puts "Shutter: #{@shutter}, brightness: #{brightness}"
       break if brightness >= BRIGHTNESS_LOWER && brightness <= BRIGHTNESS_UPPER
       if brightness < BRIGHTNESS_LOWER
-        @@shutter += 5_000
+        @shutter += 5_000
       else
-        @@shutter -= 2_000
+        @shutter -= 2_000
       end
       loops += 1
       if loops > 15
@@ -78,14 +78,16 @@ class Camera
         exit
       end
     end
-    puts "Shutter is #{@@shutter}"
-    @@shutter
+    puts "Shutter is #{@shutter}"
+    @shutter
   end
 
   def capture(shutter: 25000, gain: 0.5, filename: 'capture.jpg')
     #`libcamera-jpeg -n -t1 -o cache/capture.jpg`
     #`python3 ~/src/rubiks/lib/led.py 1`
-    `libcamera-still  -t 2 --shutter #{shutter} --gain #{gain} -o cache/#{filename}`
+    cmd = "libcamera-still  -t 2 --shutter #{shutter} --gain #{gain} -o cache/#{filename}"
+    `#{cmd}`
+    puts cmd
     #`python3 ~/src/rubiks/lib/led.py 0`
   end
 
@@ -147,7 +149,7 @@ class Camera
   def classify(pos, rgb)
     found = 9999999
     ret   = :unknown
-    @@colours.each do |k,v|
+    @colours.each do |k,v|
       next if k == :shutter
       dist = distance(rgb, v[pos])
       if dist < found
