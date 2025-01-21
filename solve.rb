@@ -27,7 +27,7 @@ strs = []
 r = Robot.new
 File.delete('debug.log') rescue nil
 [:u,:b,:d,:f,:l,:r].each_with_index do |x, idx|
-  `python3 screen_text.py "Analysing" "#{idx+1}/6" &`
+  Process.spawn("python3 screen_text.py 'Analysing' '#{idx+1}/6'")
   r.get_to_camera(x)
   colours = camera.run
   viewed[x] = Utilities.c_to_r(colours)

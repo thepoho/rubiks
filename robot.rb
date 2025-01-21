@@ -76,7 +76,7 @@ class Robot
   def perform(moves)
     total = moves.split.count
     moves.split.each_with_index do |x, idx|
-      `python3 screen_text.py "Solving" "#{idx/total}" &`
+      Process.spawn("python3 screen_text.py 'Solving' '#{idx} / #{total}'")
       puts "#{x}"
       perform_move(x)
     end

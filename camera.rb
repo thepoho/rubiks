@@ -62,7 +62,7 @@ class Camera
     @shutter = 15_000
     loops = 0
     loop do
-      filename = "capture.jpg"
+      filename = "calibration.jpg"
       capture(shutter: @shutter, filename: filename)
       brightness = get_image_brightness(filename)
       puts "Shutter: #{@shutter}, brightness: #{brightness}"

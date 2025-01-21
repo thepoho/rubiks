@@ -129,11 +129,11 @@ class Main
             #exit
             `sudo shutdown -h now`
           elsif @menu.solve_selected?
-            `python3 screen_text.py "Solving" "Please Wait" &`
+            Process.spawn("python3 screen_text.py 'Solving' 'Please Wait'") 
             Solve.run
             @menu.render(force: true)
           elsif @menu.calibrate_selected?
-            `python3 screen_text.py "Calibrating" "Please Wait" &`
+            Process.spawn("python3 screen_text.py 'Calibrating' 'Please Wait'")
             Calibrate.run
             @menu.set_selected(0)
             @menu.render(force: true)
