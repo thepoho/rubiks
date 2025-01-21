@@ -28,11 +28,11 @@ class Camera
 
   #COLOURS = YAML.load_file('colours.yml')
 
-  BRIGHTNESS_LOWER = 40
-  BRIGHTNESS_UPPER = 55
+  BRIGHTNESS_LOWER = 25
+  BRIGHTNESS_UPPER = 50
 
   @colours = {}
-  @shutter = 10_000
+  @shutter = 5_000
 
   def set_colours(data)
     @colours = data
@@ -50,16 +50,18 @@ class Camera
     colours
   end
 
-  def get_averages
-    capture(shutter: @shutter)
-    crop
+  def get_averages(face)
+    colour =  Robot.face_to_colour(face)
+    puts "Face is #{face}, colour is #{colour}"
+    capture(shutter: @shutter, cp: "cal_#{colour}")
+    crop(colour)
     colours(calibrating: true)
   end
   
   def calibrate_shutter
 
     brightness = -1
-    @shutter = 15_000
+    @shutter = 5_000
     loops = 0
     loop do
       filename = "calibration.jpg"
@@ -68,12 +70,12 @@ class Camera
       puts "Shutter: #{@shutter}, brightness: #{brightness}"
       break if brightness >= BRIGHTNESS_LOWER && brightness <= BRIGHTNESS_UPPER
       if brightness < BRIGHTNESS_LOWER
-        @shutter += 5_000
+        @shutter += 1_000
       else
-        @shutter -= 2_000
+        @shutter -= 1_000
       end
       loops += 1
-      if loops > 15
+      if loops > 25
         puts "Failed to get brightness"
         exit
       end
@@ -82,12 +84,16 @@ class Camera
     @shutter
   end
 
-  def capture(shutter: 25000, gain: 0.5, filename: 'capture.jpg')
+  def capture(shutter: 25000, gain: 0.5, filename: 'capture.jpg', cp: nil)
+    gain = 2
     #`libcamera-jpeg -n -t1 -o cache/capture.jpg`
     #`python3 ~/src/rubiks/lib/led.py 1`
-    cmd = "libcamera-still  -t 2 --shutter #{shutter} --gain #{gain} -o cache/#{filename}"
+    cmd = "libcamera-still  -t 2 --shutter #{shutter} --awbgains 1,1  --immediate --gain #{gain} -o cache/#{filename}"
     `#{cmd}`
     puts cmd
+    if cp
+      `cp cache/#{filename} cache/#{cp}.jpg`
+    end
     #`python3 ~/src/rubiks/lib/led.py 0`
   end
 
@@ -104,12 +110,14 @@ class Camera
     values = str[1..-1].chop.split(",").map &:to_f
   end
 
-  def crop
+  def crop(colour = nil)
     (0..2).each do |x|
       (0..2).each do |y|
         command = "convert cache/capture.jpg -crop #{CROP}x#{CROP}+#{X_OFFSET_START + (x*X_OFFSET_ADD)}+#{Y_OFFSET_START + (y * Y_OFFSET_ADD)} cache/#{x+(3*y)}.jpg"
-        # puts command
         `#{command}`
+        if colour
+          `cp cache/#{x+(3*y)}.jpg cache/face_#{colour}_#{x+(3*y)}.jpg`
+        end
       end
     end
   end

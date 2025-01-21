@@ -53,6 +53,10 @@ class Robot
     IDX
   end
 
+  def self.face_to_colour(face)
+     Robot::COL[Robot::IDX[face]]
+  end
+
   def face_orientation(face)
     # Give it a face from starting orientation
     # and it will tell you which way it is facing

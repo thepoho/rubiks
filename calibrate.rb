@@ -22,7 +22,7 @@ class Calibrate
       Process.spawn("python3 screen_text.py 'Calibrating' '#{idx+1}/6'")
 
       r.get_to_camera(x)
-      viewed[Utilities.face_to_colour(x)] = camera.get_averages
+      viewed[Utilities.face_to_colour(x)] = camera.get_averages(x)
       puts viewed.inspect
     #  break
     end
