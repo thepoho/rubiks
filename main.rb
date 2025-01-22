@@ -113,7 +113,9 @@ class Main
   end
 
   def run
-
+# Process.spawn("python3 screen_text.py 'Calibrating' 'Please Wait'")
+#             Calibrate.run
+#             exit
     while 1 do
       if @state == :menu
         @input.read

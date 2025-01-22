@@ -28,8 +28,8 @@ class Camera
 
   #COLOURS = YAML.load_file('colours.yml')
 
-  BRIGHTNESS_LOWER = 25
-  BRIGHTNESS_UPPER = 50
+  BRIGHTNESS_LOWER = 65
+  BRIGHTNESS_UPPER = 80
 
   @colours = {}
   @shutter = 5_000
@@ -60,8 +60,9 @@ class Camera
   
   def calibrate_shutter
 
+    return
     brightness = -1
-    @shutter = 5_000
+    @shutter = 30_000
     loops = 0
     loop do
       filename = "calibration.jpg"
@@ -70,7 +71,7 @@ class Camera
       puts "Shutter: #{@shutter}, brightness: #{brightness}"
       break if brightness >= BRIGHTNESS_LOWER && brightness <= BRIGHTNESS_UPPER
       if brightness < BRIGHTNESS_LOWER
-        @shutter += 1_000
+        @shutter += 5_000
       else
         @shutter -= 1_000
       end
@@ -84,11 +85,12 @@ class Camera
     @shutter
   end
 
-  def capture(shutter: 25000, gain: 0.5, filename: 'capture.jpg', cp: nil)
-    gain = 2
+  def capture(shutter: 5000, gain: 0.5, filename: 'capture.jpg', cp: nil)
+    gain = 9
     #`libcamera-jpeg -n -t1 -o cache/capture.jpg`
     #`python3 ~/src/rubiks/lib/led.py 1`
-    cmd = "libcamera-still  -t 2 --shutter #{shutter} --awbgains 1,1  --immediate --gain #{gain} -o cache/#{filename}"
+    cmd = "libcamera-still  --shutter #{shutter} --awb indoor --gain #{gain}  --immediate -o cache/#{filename}"
+    cmd = "libcamera-still --awb indoor --immediate -o cache/#{filename}"
     `#{cmd}`
     puts cmd
     if cp
