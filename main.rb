@@ -110,6 +110,7 @@ class Main
     @state = :menu
     @input = Input.new
     @menu = Menu.new
+    Robot.new.lga
   end
 
   def run

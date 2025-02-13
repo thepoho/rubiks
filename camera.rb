@@ -43,11 +43,11 @@ class Camera
     @colours
   end
 
-  def run
+  def run(cp: nil)
     #puts "not capturing camera"
-    capture(shutter: @shutter)
-    crop
-    colours
+    capture(shutter: @shutter, cp: cp)
+    crop(cp: cp)
+    colours(cp: cp)
   end
 
   def get_averages(face)
@@ -91,6 +91,7 @@ class Camera
     #`python3 ~/src/rubiks/lib/led.py 1`
     cmd = "libcamera-still  --shutter #{shutter} --awb indoor --gain #{gain}  --immediate -o cache/#{filename}"
     cmd = "libcamera-still --awb indoor --immediate -o cache/#{filename}"
+    cmd = "libcamera-still --awb indoor --immediate --saturation 0.4 -o cache/#{filename}"
     `#{cmd}`
     puts cmd
     if cp
@@ -112,7 +113,7 @@ class Camera
     values = str[1..-1].chop.split(",").map &:to_f
   end
 
-  def crop(colour = nil)
+  def crop(colour = nil, cp: nil)
     (0..2).each do |x|
       (0..2).each do |y|
         command = "convert cache/capture.jpg -crop #{CROP}x#{CROP}+#{X_OFFSET_START + (x*X_OFFSET_ADD)}+#{Y_OFFSET_START + (y * Y_OFFSET_ADD)} cache/#{x+(3*y)}.jpg"
@@ -120,11 +121,14 @@ class Camera
         if colour
           `cp cache/#{x+(3*y)}.jpg cache/face_#{colour}_#{x+(3*y)}.jpg`
         end
+        if cp
+          `cp cache/#{x+(3*y)}.jpg cache/#{cp}_#{x+(3*y)}.jpg`
+        end
       end
     end
   end
 
-  def colours(calibrating: false)
+  def colours(calibrating: false, cp: nil)
     all = []
     ret = []
     (0..2).each do |x|
@@ -141,6 +145,9 @@ class Camera
         txt =  "#{(3*x)+(y)}.jpg, #{values}, #{classified || nil}"
         puts txt
         File.open('debug.log','a') {|f| f.puts txt}
+        #if cp
+        #  `cp cache/#{num}.jpg cache/#{cp}_1x1_#{num}.jpg`
+        #end
         ret << classified
       end
     end
